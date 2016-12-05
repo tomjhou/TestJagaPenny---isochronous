@@ -42,6 +42,7 @@
             this.buttonReadMono = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.checkBoxShowTrailingZeros = new System.Windows.Forms.CheckBox();
+            this.buttonClearText = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPageText.SuspendLayout();
             this.tabPageGraphs.SuspendLayout();
@@ -84,7 +85,7 @@
             // 
             // buttonBrowseLogs
             // 
-            this.buttonBrowseLogs.Location = new System.Drawing.Point(658, 8);
+            this.buttonBrowseLogs.Location = new System.Drawing.Point(683, 8);
             this.buttonBrowseLogs.Margin = new System.Windows.Forms.Padding(2);
             this.buttonBrowseLogs.Name = "buttonBrowseLogs";
             this.buttonBrowseLogs.Size = new System.Drawing.Size(91, 34);
@@ -199,11 +200,23 @@
             this.checkBoxShowTrailingZeros.Text = "Show zero padding in raw data";
             this.checkBoxShowTrailingZeros.UseVisualStyleBackColor = true;
             // 
+            // buttonClearText
+            // 
+            this.buttonClearText.Location = new System.Drawing.Point(581, 8);
+            this.buttonClearText.Margin = new System.Windows.Forms.Padding(2);
+            this.buttonClearText.Name = "buttonClearText";
+            this.buttonClearText.Size = new System.Drawing.Size(74, 34);
+            this.buttonClearText.TabIndex = 11;
+            this.buttonClearText.Text = "Clear Text";
+            this.buttonClearText.UseVisualStyleBackColor = true;
+            this.buttonClearText.Click += new System.EventHandler(this.buttonClearText_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1202, 617);
+            this.Controls.Add(this.buttonClearText);
             this.Controls.Add(this.checkBoxShowTrailingZeros);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonReadMono);
@@ -241,6 +254,7 @@
         private System.Windows.Forms.Button buttonReadMono;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBoxShowTrailingZeros;
+        private System.Windows.Forms.Button buttonClearText;
     }
 }
 

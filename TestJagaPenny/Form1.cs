@@ -224,5 +224,10 @@ namespace TestJagaPenny
 //            MonoTest2.ShowConfig(richTextBox1);
             MonoTest3.ShowConfig(richTextBox1);
         }
+
+        private void buttonClearText_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+        }
     }
 }
