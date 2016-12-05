@@ -1,0 +1,22 @@
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\bin\Release\TestJagaPenny.exe.config
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\bin\Release\TestJagaPenny.exe
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\bin\Release\TestJagaPenny.pdb
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\bin\Release\LibUsbDotNet.dll
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\bin\Release\LibUsbDotNet.pdb
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\obj\Release\TestJagaPenny.csprojResolveAssemblyReference.cache
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\obj\Release\TestJagaPenny.Form1.resources
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\obj\Release\TestJagaPenny.Properties.Resources.resources
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\obj\Release\TestJagaPenny.csproj.GenerateResource.Cache
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\obj\Release\TestJagaPenny.exe
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny\TestJagaPenny\obj\Release\TestJagaPenny.pdb
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\TestJagaPenny.exe.config
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.exe
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.pdb
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.csprojResolveAssemblyReference.cache
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.Form1.resources
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.Properties.Resources.resources
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.csproj.GenerateResource.Cache
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\TestJagaPenny.exe
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\TestJagaPenny.pdb
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\LibUsbDotNet.dll
+D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\LibUsbDotNet.pdb
