@@ -83,9 +83,9 @@ namespace TestJagaPenny
 
                 UsbTransferQueue transferQueue = new UsbTransferQueue(reader,
                                                                      TRANSFER_MAX_OUTSTANDING_IO,    // # of buffers allocated
-                                                                     TRANSFER_SIZE,      // Transfer size
+                                                                     maxPacketSize,      // Transfer size
                                                                      5000,              // Timeout, milliseconds
-                                                                     maxPacketSize);//usbEndpointInfo.Descriptor.MaxPacketSize);
+                                                                     0);//If you specify zero, this will revert to usbEndpointInfo.Descriptor.MaxPacketSize);
 
                 transfersCompleted = 0;
                 samplesDisplayed = 0;
@@ -102,16 +102,22 @@ namespace TestJagaPenny
                     // then wait for the oldest outstanding transfer to complete.
                     ec = transferQueue.Transfer(out handle);
 
+                    if (transfersCompleted == 0)
+                        SafeAppendText(rtb, "Samples per transfer: " + handle.Context.IsoPacketSize + "\r\n\r\n");
+
                     if (ec != ErrorCode.Success)
                         throw new Exception("Failed to obtain data from JAGA Penny device\r\n");
 
                     // Show some information on the completed transfer.
                     transfersCompleted++;
 
-                    if (rtb.InvokeRequired)
-                        rtb.BeginInvoke((ShowTransferDelegate) showTransfer, handle, transfersCompleted, showTrailingZeros);
-                    else
-                        showTransfer(handle, transfersCompleted, showTrailingZeros);
+                    showTransfer(handle, transfersCompleted, showTrailingZeros);
+
+                    // Count # samples received.
+                    rtbStatus.BeginInvoke((MethodInvoker)delegate { rtbStatus.Text = mTotalSamplesHandled.ToString(); });
+
+                    // Write string that was obtained from showTransfer()
+                    SafeAppendText(rtb, sb.ToString());
 
                     Application.DoEvents();
                 }
@@ -122,11 +128,11 @@ namespace TestJagaPenny
                 // NOTE: A transfer queue can be reused after it's freed.
                 transferQueue.Free();
 
-                rtb.BeginInvoke((MethodInvoker)delegate { rtb.AppendText("\r\nDone!\r\n"); });
+                SafeAppendText(rtb, "\r\nDone!\r\n");
             }
             catch (Exception ex)
             {
-                rtb.BeginInvoke((MethodInvoker)delegate { rtb.AppendText("\r\n" + (ec != ErrorCode.None ? ec + ":" : String.Empty) + ex.Message); });
+                SafeAppendText(rtb, "\r\n" + (ec != ErrorCode.None ? ec + ":" : String.Empty) + ex.Message);
             }
             finally
             {
@@ -163,6 +169,11 @@ namespace TestJagaPenny
                 // Free usb resources
                 UsbDevice.Exit();
             }
+        }
+
+        private static void SafeAppendText(RichTextBox rtb, string s)
+        {
+            rtb.BeginInvoke((MethodInvoker)delegate { rtb.AppendText(s); });
         }
 
         /// <summary>
@@ -316,6 +327,10 @@ namespace TestJagaPenny
 
             old_remnant = new_remnant;
 
+            // Zero out data buffer so that we don't read old data again.
+            for (int i = 0; i < handle.Data.Length; i++)
+                handle.Data[i] = 0;
+
             for (int i = 0; i < jagaPacketData.Length; i++)
             {
                 if (jagaPacketData[i] == null)
@@ -352,15 +367,11 @@ namespace TestJagaPenny
 
             samplesPerSecond = mTotalSamplesHandled / (DateTime.Now - mStartTime).TotalSeconds;
 
-            // Count # samples received.
-            rtbStatus.Text = mTotalSamplesHandled.ToString();
-
             sb.Append(String.Format("#{0} complete. {1} samples/sec ({2} bytes)\r\n\r\n",
                             transferIndex,
                             Math.Round(samplesPerSecond, 2),
                             handle.Transferred));
 
-            rtb.AppendText(sb.ToString());
         }
 
         /// <summary>
@@ -431,17 +442,37 @@ namespace TestJagaPenny
 
             if (numOldTransfers > 0)
             {
-                while ((bytesRemaining = actualLength[0] - frameStart[0]) > bytesPerJagaPacketWithHeader)
+                while (true)
                 {
+                    if (frameStart[0] < 0)
+                    {
+                        // No detected frame start in old remnant. Just go on.
+                        bytesRemaining = 0;
+                        break;
+                    }
+
+                    bytesRemaining = actualLength[0] - frameStart[0];
+                    if (bytesRemaining < bytesPerJagaPacketWithHeader)
+                        break;
+
+                    if (!MatchHeader(old_remnant, frameStart[0]))
+                    {
+                        // Although first frame is guaranteed to match, the next ones might not, since they haven't been explicitly checked. Skip remnant.
+                        // Actually, there is a chance that there is another frame here, but that it simply is offset. This is NOT LIKELY, so we don't check for it.
+                        bytesRemaining = 0;
+                        break;
+                    }
+
                     ByteToWordCopy(old_remnant, sampleDataTmp[currentSample], frameStart[0] + headerSize, 0, dataWordsPerJagaPacket);
 
                     frameStart[0] += bytesPerJagaPacketWithHeader;
                     currentSample++;
+
                 }
 
                 if (bytesRemaining == 0)
                 {
-                    // We have used up all data in this transfer. Go on to the next one.
+                    // We have used up all data in this transfer, or there isn't any header. Go on to the next one.
                     currentTransfer++;
                 }
                 else if (bytesRemaining < 0)
@@ -454,40 +485,42 @@ namespace TestJagaPenny
                     // Figure out how many bytes are in the next transfer
                     int bytesInNextFrame;
                     bytesInNextFrame = frameStart[1];
-                    int mismatch = bytesInNextFrame + bytesRemaining - bytesPerJagaPacketWithHeader;
-                    if (mismatch < 0)
+                    if (bytesInNextFrame > 0)
                     {
-                        // Anomalous frame, has insufficient # of bytes
-                        // Assume that we've underestimated size of first frame, by falsely assuming that trailing
-                        // zeros were padding
-                        if (mismatch > -10)
+                        int mismatch = bytesInNextFrame + bytesRemaining - bytesPerJagaPacketWithHeader;
+                        if (mismatch < 0)
                         {
-                            // If shortfall is less than 10, then just assume trailing zeros are part of the first packet portion, and hope for the best.
-                            bytesRemaining = bytesPerJagaPacketWithHeader - bytesInNextFrame;
-                            Array.Resize<byte>(ref old_remnant, bytesRemaining);
+                            // Anomalous frame, has insufficient # of bytes
+                            // Assume that we've underestimated size of first frame, by falsely assuming that trailing
+                            // zeros were padding
+                            if (mismatch > -10)
+                            {
+                                // If shortfall is less than 10, then just assume trailing zeros are part of the first packet portion, and hope for the best.
+                                bytesRemaining = bytesPerJagaPacketWithHeader - bytesInNextFrame;
+                                Array.Resize<byte>(ref old_remnant, bytesRemaining);
+                            }
+                            //                        else
+                            //                            throw new Exception("Please contact program developer - Isochronous data transfer error #3");
                         }
-//                        else
-//                            throw new Exception("Please contact program developer - Isochronous data transfer error #3");
+                        else if (mismatch > 0)
+                        {
+                            // Have excess. Probably due to a lost header, causing two packets to appear as one mega-packet
+                            //                        throw new Exception("Please contact program developer - Isochronous data transfer error #2");
+                        }
+
+                        if (mismatch == 0)
+                        {
+                            // Frame is spread over two transfers
+                            int wordsRemaining = bytesRemaining >> 1;
+                            sampleDataTmp[currentSample] = new int[dataWordsPerJagaPacket];
+
+                            Array.Copy(old_remnant, frameStart[0], tmpPacket, 0, bytesRemaining);
+                            Array.Copy(data, 0, tmpPacket, bytesRemaining, (bytesPerJagaPacketWithHeader - bytesRemaining));
+
+                            ByteToWordCopy(tmpPacket, sampleDataTmp[currentSample], 4, 0, dataWordsPerJagaPacket);
+                            currentSample++;
+                        }
                     }
-                    else if (mismatch > 0)
-                    {
-                        // Have excess. Probably due to a lost header, causing two packets to appear as one mega-packet
-//                        throw new Exception("Please contact program developer - Isochronous data transfer error #2");
-                    }
-
-                    if (mismatch == 0)
-                    {
-                        // Frame is spread over two transfers
-                        int wordsRemaining = bytesRemaining >> 1;
-                        sampleDataTmp[currentSample] = new int[dataWordsPerJagaPacket];
-
-                        Array.Copy(old_remnant, frameStart[0], tmpPacket, 0, bytesRemaining);
-                        Array.Copy(data,        0,             tmpPacket, bytesRemaining, (bytesPerJagaPacketWithHeader - bytesRemaining));
-
-                        ByteToWordCopy(tmpPacket, sampleDataTmp[currentSample], 4, 0, dataWordsPerJagaPacket);
-                        currentSample++;
-                    }
-
                     currentTransfer++;
                 }
             }
@@ -497,7 +530,7 @@ namespace TestJagaPenny
                 int newTransferIndex = currentTransfer - numOldTransfers;   // Index into new data
                 int transferBoundary1 = newTransferIndex * usbTransferSize; // Start of current transfer boundary
 
-                if (frameStart[newTransferIndex] < 0)
+                if (frameStart[currentTransfer] < 0)
                 {
                     // No frame was detected in this transfer. Dropped packets?
                     currentTransfer++;
@@ -515,6 +548,15 @@ namespace TestJagaPenny
                         // We have a partial JAGA packet. Must combine with next transfer's data.
                         break;
                     }
+
+                    if (!MatchHeader(data, frameStart[currentTransfer]))
+                    {
+                        // Although first frame is guaranteed to match, the next ones might not, since they haven't been explicitly checked.
+                        // Actually, there is a chance that there is another frame here, but that it simply is offset. This is NOT LIKELY, so we don't check for it.
+                        bytesRemaining = 0;
+                        break;
+                    }
+
                     sampleDataTmp[currentSample] = new int[dataWordsPerJagaPacket];
 
                     ByteToWordCopy(data, sampleDataTmp[currentSample], frameStart[currentTransfer] + headerSize, 0, dataWordsPerJagaPacket);
@@ -590,12 +632,16 @@ namespace TestJagaPenny
                     int wordsRemaining = bytesRemaining >> 1;
                     sampleDataTmp[currentSample] = new int[dataWordsPerJagaPacket];
 
+
                     Array.Copy(data, frameStart[currentTransfer], tmpPacket, 0, bytesRemaining);
                     Array.Copy(data, transferBoundary2,           tmpPacket, bytesRemaining, (bytesPerJagaPacketWithHeader - bytesRemaining));
 
-                    ByteToWordCopy(tmpPacket, sampleDataTmp[currentSample], 4, 0, dataWordsPerJagaPacket);
+                    if (MatchHeader(tmpPacket, 0))
+                    {
+                        ByteToWordCopy(tmpPacket, sampleDataTmp[currentSample], 4, 0, dataWordsPerJagaPacket);
+                        currentSample++;
+                    }
 
-                    currentSample++;
                     currentTransfer++;
                 }
             }

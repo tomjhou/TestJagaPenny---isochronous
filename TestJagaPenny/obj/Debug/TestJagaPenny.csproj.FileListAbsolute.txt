@@ -30,3 +30,6 @@ E:\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\D
 E:\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.Form1.resources
 E:\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.Properties.Resources.resources
 E:\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.csproj.GenerateResource.Cache
+E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Debug\TestJagaPenny.exe.config
+E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.exe
+E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.pdb
