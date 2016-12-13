@@ -209,7 +209,11 @@ namespace TestJagaPenny
 
         private void buttonReadIso_Click(object sender, EventArgs e)
         {
-            ReadIsochronous.StartIsochronous(richTextBox1, textBoxCount, checkBoxShowTrailingZeros.Checked);
+            ReadIsochronous.TransferParams tParams = new ReadIsochronous.TransferParams();
+            tParams.showErroneous = checkBoxShowErroneousPackets.Checked;
+            tParams.showHeaders = checkBoxSelectivelyShowHeaders.Checked;
+
+            ReadIsochronous.StartIsochronous(richTextBox1, textBoxCount, tParams);
         }
 
         private void buttonStopIso_Click(object sender, EventArgs e)

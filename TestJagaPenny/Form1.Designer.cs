@@ -41,8 +41,9 @@
             this.buttonStopIso = new System.Windows.Forms.Button();
             this.buttonReadMono = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.checkBoxShowTrailingZeros = new System.Windows.Forms.CheckBox();
+            this.checkBoxShowErroneousPackets = new System.Windows.Forms.CheckBox();
             this.buttonClearText = new System.Windows.Forms.Button();
+            this.checkBoxSelectivelyShowHeaders = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPageText.SuspendLayout();
             this.tabPageGraphs.SuspendLayout();
@@ -188,17 +189,17 @@
             this.label1.TabIndex = 9;
             this.label1.Text = "Samples processed";
             // 
-            // checkBoxShowTrailingZeros
+            // checkBoxShowErroneousPackets
             // 
-            this.checkBoxShowTrailingZeros.AutoSize = true;
-            this.checkBoxShowTrailingZeros.Checked = true;
-            this.checkBoxShowTrailingZeros.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxShowTrailingZeros.Location = new System.Drawing.Point(394, 18);
-            this.checkBoxShowTrailingZeros.Name = "checkBoxShowTrailingZeros";
-            this.checkBoxShowTrailingZeros.Size = new System.Drawing.Size(172, 17);
-            this.checkBoxShowTrailingZeros.TabIndex = 10;
-            this.checkBoxShowTrailingZeros.Text = "Show zero padding in raw data";
-            this.checkBoxShowTrailingZeros.UseVisualStyleBackColor = true;
+            this.checkBoxShowErroneousPackets.AutoSize = true;
+            this.checkBoxShowErroneousPackets.Checked = true;
+            this.checkBoxShowErroneousPackets.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxShowErroneousPackets.Location = new System.Drawing.Point(380, 8);
+            this.checkBoxShowErroneousPackets.Name = "checkBoxShowErroneousPackets";
+            this.checkBoxShowErroneousPackets.Size = new System.Drawing.Size(134, 17);
+            this.checkBoxShowErroneousPackets.TabIndex = 10;
+            this.checkBoxShowErroneousPackets.Text = "Selectively show errors";
+            this.checkBoxShowErroneousPackets.UseVisualStyleBackColor = true;
             // 
             // buttonClearText
             // 
@@ -211,13 +212,26 @@
             this.buttonClearText.UseVisualStyleBackColor = true;
             this.buttonClearText.Click += new System.EventHandler(this.buttonClearText_Click);
             // 
+            // checkBoxSelectivelyShowHeaders
+            // 
+            this.checkBoxSelectivelyShowHeaders.AutoSize = true;
+            this.checkBoxSelectivelyShowHeaders.Checked = true;
+            this.checkBoxSelectivelyShowHeaders.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxSelectivelyShowHeaders.Location = new System.Drawing.Point(380, 24);
+            this.checkBoxSelectivelyShowHeaders.Name = "checkBoxSelectivelyShowHeaders";
+            this.checkBoxSelectivelyShowHeaders.Size = new System.Drawing.Size(182, 17);
+            this.checkBoxSelectivelyShowHeaders.TabIndex = 12;
+            this.checkBoxSelectivelyShowHeaders.Text = "Selectively show header packets";
+            this.checkBoxSelectivelyShowHeaders.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1202, 617);
+            this.Controls.Add(this.checkBoxSelectivelyShowHeaders);
             this.Controls.Add(this.buttonClearText);
-            this.Controls.Add(this.checkBoxShowTrailingZeros);
+            this.Controls.Add(this.checkBoxShowErroneousPackets);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonReadMono);
             this.Controls.Add(this.buttonStopIso);
@@ -253,8 +267,9 @@
         private System.Windows.Forms.Button buttonStopIso;
         private System.Windows.Forms.Button buttonReadMono;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckBox checkBoxShowTrailingZeros;
+        private System.Windows.Forms.CheckBox checkBoxShowErroneousPackets;
         private System.Windows.Forms.Button buttonClearText;
+        private System.Windows.Forms.CheckBox checkBoxSelectivelyShowHeaders;
     }
 }
 
