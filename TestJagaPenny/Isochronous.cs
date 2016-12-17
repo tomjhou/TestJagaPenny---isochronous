@@ -26,7 +26,7 @@ namespace TestJagaPenny
         public static readonly byte TRANSFER_ENDPOINT = UsbConstants.ENDPOINT_DIR_MASK;
 
         /// <summary>Number of transfers to sumbit before waiting begins</summary>
-        public static readonly int TRANSFER_MAX_OUTSTANDING_IO = 100;
+        public static readonly int TRANSFER_MAX_OUTSTANDING_IO = 20;
 
         /// <summary>Size of each transfer</summary>
         public static int TRANSFER_SIZE;
@@ -36,7 +36,7 @@ namespace TestJagaPenny
         /// <summary>
         /// Use this to calculate transfer rate
         /// </summary>
-        private static double mTotalSamplesHandled = 0.0;
+        private static double mTotalPacketsHandled = 0.0;
         private static int transfersCompleted = 0;
 
         static RichTextBox rtb;
@@ -48,6 +48,7 @@ namespace TestJagaPenny
         {
             public bool showErroneous;
             public bool showHeaders;
+            public bool showLargeGapsOnly;
         }
 
         public static void StartIsochronous(RichTextBox _rtb, TextBox _tbStatus, TransferParams tParams)
@@ -94,13 +95,17 @@ namespace TestJagaPenny
                                                                      0);//If you specify zero, this will revert to usbEndpointInfo.Descriptor.MaxPacketSize);
 
                 transfersCompleted = 0;
-                samplesDisplayed = 0;
-                mTotalSamplesHandled = 0;
+                transfersReceived = 0;
+                mTotalPacketsHandled = 0;
+                prevPacketCounter = -1;
                 old_remnant = null;
 
                 UsbTransferQueue.Handle handle;
 
                 mStartTime = DateTime.Now;
+
+                sb.Clear();
+                sbPreviousTransfer.Clear();
 
                 while (!Program.quitFlag)
                 {
@@ -112,15 +117,20 @@ namespace TestJagaPenny
                         SafeAppendText(rtb, "Samples per transfer: " + handle.Context.IsoPacketSize + "\r\n\r\n");
 
                     if (ec != ErrorCode.Success)
-                        throw new Exception("Failed to obtain data from JAGA Penny device\r\n");
+                    {
+                        // Send any residual text to screen.
+                        SafeAppendText(rtb, sb.ToString());
+                        sb.Clear();
+                        throw new Exception("Failed to obtain data from JAGA Penny device");
+                    }
 
                     // Show some information on the completed transfer.
                     transfersCompleted++;
 
                     showTransfer(handle, transfersCompleted, tParams);
 
-                    // Count # samples received.
-                    rtbStatus.BeginInvoke((MethodInvoker)delegate { rtbStatus.Text = mTotalSamplesHandled.ToString(); });
+                    // Count # packets received.
+                    rtbStatus.BeginInvoke((MethodInvoker)delegate { rtbStatus.Text = mTotalPacketsHandled.ToString(); });
 
                     // Write string that was obtained from showTransfer()
                     if (sb.Length > 2000)
@@ -132,8 +142,6 @@ namespace TestJagaPenny
                     Application.DoEvents();
                 }
 
-                prevPacketCounter = -1;
-
                 // Cancels any oustanding transfers and frees the transfer queue handles.
                 // NOTE: A transfer queue can be reused after it's freed.
                 transferQueue.Free();
@@ -142,7 +150,7 @@ namespace TestJagaPenny
             }
             catch (Exception ex)
             {
-                SafeAppendText(rtb, "\r\n" + (ec != ErrorCode.None ? ec + ":" : String.Empty) + ex.Message + " : " + System.Runtime.InteropServices.Marshal.GetLastWin32Error());
+                SafeAppendText(rtb, "\r\n" + (ec != ErrorCode.None ? ec + ":" : String.Empty) + ex.Message + " : " + System.Runtime.InteropServices.Marshal.GetLastWin32Error() + "\r\n");
             }
             finally
             {
@@ -178,6 +186,8 @@ namespace TestJagaPenny
 
                 // Free usb resources
                 UsbDevice.Exit();
+
+                prevPacketCounter = -1;
             }
         }
 
@@ -275,7 +285,7 @@ namespace TestJagaPenny
         static StringBuilder sb = new StringBuilder();
         static StringBuilder sbPreviousTransfer = new StringBuilder();
 
-        static int samplesDisplayed = 0;
+        static int transfersReceived = 0;
         static int prevPacketCounter = -1;
 
         static byte[] old_remnant, new_remnant;
@@ -303,11 +313,14 @@ namespace TestJagaPenny
             bool hasErroneousPacket = false;
 
             sbCurrentTransfer.Append("\r\n");
-            // Show sample # at beginning of each line
-            sbCurrentTransfer.Append((samplesDisplayed++).ToString() + "\t");
+
+            // Show transfer # at beginning of each line
+            sbCurrentTransfer.Append((transfersReceived++).ToString() + "\t");
 
             for (int j = 0; j < handle.Transferred; j++)
+            {
                 sbCurrentTransfer.Append(String.Format(" {0:X2}", handle.Data[j]));
+            }
 
             sbCurrentTransfer.Append(string.Format("\t:{0} bytes\r\n", handle.Transferred));
 
@@ -318,7 +331,7 @@ namespace TestJagaPenny
                     break;
 
                 packetCounter = 0;
-                sbCurrentTransfer.Append("\r\n" + i.ToString() + "\t");
+                sbCurrentTransfer.Append("\r\n" + mTotalPacketsHandled.ToString() + "\t");
 
                 int numSamples = jagaPacketData[i].Length;
 
@@ -328,10 +341,13 @@ namespace TestJagaPenny
                     int val = jagaPacketData[i][j];
                     packetCounter = packetCounter * 2 + (val & 1);
 
+                    if (j % 4 == 0)
+                        sbCurrentTransfer.Append("  ");
+
                     sbCurrentTransfer.Append(String.Format(" {0:X4}", val));
                 }
 
-                mTotalSamplesHandled += numSamples;
+                mTotalPacketsHandled++;
 
                 // Append packet counter
                 sbCurrentTransfer.Append(String.Format("\t:{0:X4}", packetCounter));
@@ -341,10 +357,13 @@ namespace TestJagaPenny
                     int gap = packetCounter - prevPacketCounter;
                     sbCurrentTransfer.Append(String.Format("\tGap {0}", gap));
 
-                    if (gap > 1)
+                    if (gap != 1)
                     {
-                        hasErroneousPacket = true;
-                        sbCurrentTransfer.Append(" ******************** ");
+                        if ((gap < 0 || gap > 2) || !tParams.showLargeGapsOnly)
+                        {
+                            hasErroneousPacket = true;
+                            sbCurrentTransfer.Append(" ******************** ");
+                        }
                     }
                 }
 
@@ -354,14 +373,19 @@ namespace TestJagaPenny
 
             sbCurrentTransfer.Append("\r\n");
 
-            samplesPerSecond = mTotalSamplesHandled / (DateTime.Now - mStartTime).TotalSeconds;
+            samplesPerSecond = mTotalPacketsHandled / (DateTime.Now - mStartTime).TotalSeconds;
 
             sbCurrentTransfer.Append(String.Format("#{0} complete. {1} samples/sec ({2} bytes)\r\n\r\n",
                             transferIndex,
                             Math.Round(samplesPerSecond, 2),
                             handle.Transferred));
 
-            bool showThis = (tParams.showErroneous && hasErroneousPacket) || (tParams.showHeaders && hasHeader);
+            bool showThis;
+
+            if (!tParams.showErroneous && !tParams.showHeaders)
+                showThis = true;
+            else
+                showThis = (tParams.showErroneous && hasErroneousPacket) || (tParams.showHeaders && hasHeader);
 
             if (!showThis)
                 goto Done;
@@ -463,7 +487,7 @@ Done:
                     break;
                 }
 
-                if (!MatchHeader(data, frameStart))
+                if (IsNewVersion && !MatchHeader(data, frameStart))
                 {
                     // Although first frame is guaranteed to match, the next ones might not, since they haven't been explicitly checked.
                     // Actually, there is a chance that there is another frame here, but that it simply is offset. This is NOT LIKELY, so we don't check for it.

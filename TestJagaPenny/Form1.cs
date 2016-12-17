@@ -212,6 +212,7 @@ namespace TestJagaPenny
             ReadIsochronous.TransferParams tParams = new ReadIsochronous.TransferParams();
             tParams.showErroneous = checkBoxShowErroneousPackets.Checked;
             tParams.showHeaders = checkBoxSelectivelyShowHeaders.Checked;
+            tParams.showLargeGapsOnly = checkBoxShowGapsAbove2.Checked;
 
             ReadIsochronous.StartIsochronous(richTextBox1, textBoxCount, tParams);
         }

@@ -44,6 +44,7 @@
             this.checkBoxShowErroneousPackets = new System.Windows.Forms.CheckBox();
             this.buttonClearText = new System.Windows.Forms.Button();
             this.checkBoxSelectivelyShowHeaders = new System.Windows.Forms.CheckBox();
+            this.checkBoxShowGapsAbove2 = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPageText.SuspendLayout();
             this.tabPageGraphs.SuspendLayout();
@@ -185,9 +186,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(170, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 13);
+            this.label1.Size = new System.Drawing.Size(98, 13);
             this.label1.TabIndex = 9;
-            this.label1.Text = "Samples processed";
+            this.label1.Text = "Packets processed";
             // 
             // checkBoxShowErroneousPackets
             // 
@@ -215,8 +216,6 @@
             // checkBoxSelectivelyShowHeaders
             // 
             this.checkBoxSelectivelyShowHeaders.AutoSize = true;
-            this.checkBoxSelectivelyShowHeaders.Checked = true;
-            this.checkBoxSelectivelyShowHeaders.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxSelectivelyShowHeaders.Location = new System.Drawing.Point(380, 24);
             this.checkBoxSelectivelyShowHeaders.Name = "checkBoxSelectivelyShowHeaders";
             this.checkBoxSelectivelyShowHeaders.Size = new System.Drawing.Size(182, 17);
@@ -224,11 +223,24 @@
             this.checkBoxSelectivelyShowHeaders.Text = "Selectively show header packets";
             this.checkBoxSelectivelyShowHeaders.UseVisualStyleBackColor = true;
             // 
+            // checkBoxShowGapsAbove2
+            // 
+            this.checkBoxShowGapsAbove2.AutoSize = true;
+            this.checkBoxShowGapsAbove2.Checked = true;
+            this.checkBoxShowGapsAbove2.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxShowGapsAbove2.Location = new System.Drawing.Point(1019, 8);
+            this.checkBoxShowGapsAbove2.Name = "checkBoxShowGapsAbove2";
+            this.checkBoxShowGapsAbove2.Size = new System.Drawing.Size(163, 17);
+            this.checkBoxShowGapsAbove2.TabIndex = 13;
+            this.checkBoxShowGapsAbove2.Text = "Show only gaps larger than 2";
+            this.checkBoxShowGapsAbove2.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1202, 617);
+            this.Controls.Add(this.checkBoxShowGapsAbove2);
             this.Controls.Add(this.checkBoxSelectivelyShowHeaders);
             this.Controls.Add(this.buttonClearText);
             this.Controls.Add(this.checkBoxShowErroneousPackets);
@@ -270,6 +282,7 @@
         private System.Windows.Forms.CheckBox checkBoxShowErroneousPackets;
         private System.Windows.Forms.Button buttonClearText;
         private System.Windows.Forms.CheckBox checkBoxSelectivelyShowHeaders;
+        private System.Windows.Forms.CheckBox checkBoxShowGapsAbove2;
     }
 }
 
