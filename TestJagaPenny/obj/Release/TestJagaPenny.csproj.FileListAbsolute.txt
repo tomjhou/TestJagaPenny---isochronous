@@ -20,3 +20,6 @@ D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenn
 D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\TestJagaPenny.pdb
 D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\LibUsbDotNet.dll
 D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\LibUsbDotNet.pdb
+E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Release\TestJagaPenny.exe.config
+E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.exe
+E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Release\TestJagaPenny.pdb

@@ -45,6 +45,8 @@
             this.buttonClearText = new System.Windows.Forms.Button();
             this.checkBoxSelectivelyShowHeaders = new System.Windows.Forms.CheckBox();
             this.checkBoxShowGapsAbove2 = new System.Windows.Forms.CheckBox();
+            this.richTextBoxHeaderInfo = new System.Windows.Forms.RichTextBox();
+            this.richTextBoxLostPackets = new System.Windows.Forms.RichTextBox();
             this.tabControl1.SuspendLayout();
             this.tabPageText.SuspendLayout();
             this.tabPageGraphs.SuspendLayout();
@@ -57,7 +59,7 @@
             this.richTextBox1.Location = new System.Drawing.Point(3, 3);
             this.richTextBox1.Margin = new System.Windows.Forms.Padding(2);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(1185, 536);
+            this.richTextBox1.Size = new System.Drawing.Size(1185, 499);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -115,10 +117,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPageText);
             this.tabControl1.Controls.Add(this.tabPageGraphs);
-            this.tabControl1.Location = new System.Drawing.Point(2, 47);
+            this.tabControl1.Location = new System.Drawing.Point(2, 84);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1199, 568);
+            this.tabControl1.Size = new System.Drawing.Size(1199, 531);
             this.tabControl1.TabIndex = 5;
             // 
             // tabPageText
@@ -127,7 +129,7 @@
             this.tabPageText.Location = new System.Drawing.Point(4, 22);
             this.tabPageText.Name = "tabPageText";
             this.tabPageText.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageText.Size = new System.Drawing.Size(1191, 542);
+            this.tabPageText.Size = new System.Drawing.Size(1191, 505);
             this.tabPageText.TabIndex = 0;
             this.tabPageText.Text = "Text";
             this.tabPageText.UseVisualStyleBackColor = true;
@@ -235,11 +237,31 @@
             this.checkBoxShowGapsAbove2.Text = "Show only gaps larger than 2";
             this.checkBoxShowGapsAbove2.UseVisualStyleBackColor = true;
             // 
+            // richTextBoxHeaderInfo
+            // 
+            this.richTextBoxHeaderInfo.Location = new System.Drawing.Point(6, 48);
+            this.richTextBoxHeaderInfo.Name = "richTextBoxHeaderInfo";
+            this.richTextBoxHeaderInfo.Size = new System.Drawing.Size(508, 30);
+            this.richTextBoxHeaderInfo.TabIndex = 14;
+            this.richTextBoxHeaderInfo.Text = "";
+            // 
+            // richTextBoxLostPackets
+            // 
+            this.richTextBoxLostPackets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBoxLostPackets.Location = new System.Drawing.Point(520, 48);
+            this.richTextBoxLostPackets.Name = "richTextBoxLostPackets";
+            this.richTextBoxLostPackets.Size = new System.Drawing.Size(677, 30);
+            this.richTextBoxLostPackets.TabIndex = 15;
+            this.richTextBoxLostPackets.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1202, 617);
+            this.Controls.Add(this.richTextBoxLostPackets);
+            this.Controls.Add(this.richTextBoxHeaderInfo);
             this.Controls.Add(this.checkBoxShowGapsAbove2);
             this.Controls.Add(this.checkBoxSelectivelyShowHeaders);
             this.Controls.Add(this.buttonClearText);
@@ -283,6 +305,8 @@
         private System.Windows.Forms.Button buttonClearText;
         private System.Windows.Forms.CheckBox checkBoxSelectivelyShowHeaders;
         private System.Windows.Forms.CheckBox checkBoxShowGapsAbove2;
+        private System.Windows.Forms.RichTextBox richTextBoxHeaderInfo;
+        private System.Windows.Forms.RichTextBox richTextBoxLostPackets;
     }
 }
 

@@ -214,7 +214,7 @@ namespace TestJagaPenny
             tParams.showHeaders = checkBoxSelectivelyShowHeaders.Checked;
             tParams.showLargeGapsOnly = checkBoxShowGapsAbove2.Checked;
 
-            ReadIsochronous.StartIsochronous(richTextBox1, textBoxCount, tParams);
+            ReadIsochronous.StartIsochronous(richTextBox1, richTextBoxHeaderInfo, richTextBoxLostPackets, textBoxCount, tParams);
         }
 
         private void buttonStopIso_Click(object sender, EventArgs e)
