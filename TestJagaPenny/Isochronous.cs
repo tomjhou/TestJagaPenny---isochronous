@@ -303,6 +303,10 @@ namespace TestJagaPenny
         static int packetsCorrected = 0;
         static int prevPacketCounter = -1;
 
+        static int samplesPerPacket = -1;
+        static int channels = -1;
+        static int sample_rate = -1;
+
         static byte[] old_remnant, new_remnant;
 
         private static void showTransfer(UsbTransferQueue.Handle handle, int transferIndex, TransferParams tParams)
@@ -342,9 +346,13 @@ namespace TestJagaPenny
 
             if (header >= 0 && handle.Data.Length > header + 11)
             {
+                samplesPerPacket = handle.Data[header + 10];
+                channels = handle.Data[header + 9];
+                sample_rate = (handle.Data[header + 11] << 8) + handle.Data[header + 12];
+
                 sbCurrentTransfer.Append(" HEADER PACKET");
 
-                sb_header.Append(string.Format("Header info: version {0}, channels {1}, samples per packet {2}, sample rate {3}", handle.Data[header + 8], handle.Data[header + 9], handle.Data[header + 10], (handle.Data[header + 11] << 8) + handle.Data[header + 12]));
+                sb_header.Append(string.Format("Header info: version {0}, channels {1}, samples per packet {2}, sample rate {3}", handle.Data[header + 8], channels, samplesPerPacket, sample_rate));
             }
 
             if (jagaPacketData.Length > 0)
@@ -427,7 +435,7 @@ namespace TestJagaPenny
 
             sbCurrentTransfer.Append(", ");
 
-            samplesPerSecond = mTotalPacketsHandled / (DateTime.Now - mStartTime).TotalSeconds;
+            samplesPerSecond = mTotalPacketsHandled * samplesPerPacket / channels / (DateTime.Now - mStartTime).TotalSeconds;
 
             sbCurrentTransfer.Append(String.Format("{0} USB transfers complete. {1} avg samples/sec ({2} bytes transferred)\r\n\r\n",
                             transferIndex,
