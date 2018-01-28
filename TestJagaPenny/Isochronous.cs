@@ -344,7 +344,7 @@ namespace TestJagaPenny
             {
                 sbCurrentTransfer.Append(" HEADER PACKET");
 
-                sb_header.Append(string.Format("Header info: version {0}, channels {1}, sample rate {2}", handle.Data[header + 8], handle.Data[header + 9], handle.Data[header + 10] << 8 + handle.Data[header + 11]));
+                sb_header.Append(string.Format("Header info: version {0}, channels {1}, samples per packet {2}, sample rate {3}", handle.Data[header + 8], handle.Data[header + 9], handle.Data[header + 10], (handle.Data[header + 11] << 8) + handle.Data[header + 12]));
             }
 
             if (jagaPacketData.Length > 0)
@@ -400,7 +400,7 @@ namespace TestJagaPenny
                                 if (CalculateIncrement14_bit(prevPacketCounter, adjustedCounter) == 1)
                                 {
                                     // We have fixed packet counter
-                                    sbCurrentTransfer.Append("Corrected packet counter from " + packetCounter + " to " + adjustedCounter);
+                                    sbCurrentTransfer.Append(" \tCorrected packet counter from " + packetCounter + " to " + adjustedCounter);
                                     packetCounter = adjustedCounter;
                                     packetsCorrected++;
 
