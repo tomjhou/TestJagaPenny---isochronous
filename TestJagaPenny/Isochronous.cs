@@ -435,7 +435,7 @@ namespace TestJagaPenny
 
             sbCurrentTransfer.Append(", ");
 
-            samplesPerSecond = mTotalPacketsHandled * samplesPerPacket / channels / (DateTime.Now - mStartTime).TotalSeconds;
+            samplesPerSecond = mTotalPacketsHandled * samplesPerPacket / channels / 2 / (DateTime.Now - mStartTime).TotalSeconds;
 
             sbCurrentTransfer.Append(String.Format("{0} USB transfers complete. {1} avg samples/sec ({2} bytes transferred)\r\n\r\n",
                             transferIndex,
