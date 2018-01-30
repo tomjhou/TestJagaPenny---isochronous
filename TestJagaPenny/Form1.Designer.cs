@@ -44,9 +44,10 @@
             this.checkBoxShowErroneousPackets = new System.Windows.Forms.CheckBox();
             this.buttonClearText = new System.Windows.Forms.Button();
             this.checkBoxSelectivelyShowHeaders = new System.Windows.Forms.CheckBox();
-            this.checkBoxShowGapsAbove2 = new System.Windows.Forms.CheckBox();
             this.richTextBoxHeaderInfo = new System.Windows.Forms.RichTextBox();
             this.richTextBoxLostPackets = new System.Windows.Forms.RichTextBox();
+            this.checkBoxShowCorrected = new System.Windows.Forms.CheckBox();
+            this.checkBoxShowAllPackets = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPageText.SuspendLayout();
             this.tabPageGraphs.SuspendLayout();
@@ -59,7 +60,7 @@
             this.richTextBox1.Location = new System.Drawing.Point(3, 3);
             this.richTextBox1.Margin = new System.Windows.Forms.Padding(2);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(1185, 499);
+            this.richTextBox1.Size = new System.Drawing.Size(1185, 469);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -117,10 +118,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPageText);
             this.tabControl1.Controls.Add(this.tabPageGraphs);
-            this.tabControl1.Location = new System.Drawing.Point(2, 84);
+            this.tabControl1.Location = new System.Drawing.Point(2, 114);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1199, 531);
+            this.tabControl1.Size = new System.Drawing.Size(1199, 501);
             this.tabControl1.TabIndex = 5;
             // 
             // tabPageText
@@ -129,7 +130,7 @@
             this.tabPageText.Location = new System.Drawing.Point(4, 22);
             this.tabPageText.Name = "tabPageText";
             this.tabPageText.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageText.Size = new System.Drawing.Size(1191, 505);
+            this.tabPageText.Size = new System.Drawing.Size(1191, 475);
             this.tabPageText.TabIndex = 0;
             this.tabPageText.Text = "Text";
             this.tabPageText.UseVisualStyleBackColor = true;
@@ -140,7 +141,7 @@
             this.tabPageGraphs.Location = new System.Drawing.Point(4, 22);
             this.tabPageGraphs.Name = "tabPageGraphs";
             this.tabPageGraphs.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageGraphs.Size = new System.Drawing.Size(1191, 542);
+            this.tabPageGraphs.Size = new System.Drawing.Size(1191, 505);
             this.tabPageGraphs.TabIndex = 1;
             this.tabPageGraphs.Text = "Graphs";
             this.tabPageGraphs.UseVisualStyleBackColor = true;
@@ -150,12 +151,12 @@
             this.panelGraphs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelGraphs.Location = new System.Drawing.Point(3, 3);
             this.panelGraphs.Name = "panelGraphs";
-            this.panelGraphs.Size = new System.Drawing.Size(1185, 536);
+            this.panelGraphs.Size = new System.Drawing.Size(1185, 499);
             this.panelGraphs.TabIndex = 0;
             // 
             // textBoxCount
             // 
-            this.textBoxCount.Location = new System.Drawing.Point(274, 16);
+            this.textBoxCount.Location = new System.Drawing.Point(274, 8);
             this.textBoxCount.Name = "textBoxCount";
             this.textBoxCount.Size = new System.Drawing.Size(100, 20);
             this.textBoxCount.TabIndex = 6;
@@ -186,7 +187,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(170, 18);
+            this.label1.Location = new System.Drawing.Point(170, 10);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(98, 13);
             this.label1.TabIndex = 9;
@@ -197,11 +198,11 @@
             this.checkBoxShowErroneousPackets.AutoSize = true;
             this.checkBoxShowErroneousPackets.Checked = true;
             this.checkBoxShowErroneousPackets.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxShowErroneousPackets.Location = new System.Drawing.Point(380, 8);
+            this.checkBoxShowErroneousPackets.Location = new System.Drawing.Point(389, 10);
             this.checkBoxShowErroneousPackets.Name = "checkBoxShowErroneousPackets";
-            this.checkBoxShowErroneousPackets.Size = new System.Drawing.Size(134, 17);
+            this.checkBoxShowErroneousPackets.Size = new System.Drawing.Size(118, 17);
             this.checkBoxShowErroneousPackets.TabIndex = 10;
-            this.checkBoxShowErroneousPackets.Text = "Selectively show errors";
+            this.checkBoxShowErroneousPackets.Text = "Show error packets";
             this.checkBoxShowErroneousPackets.UseVisualStyleBackColor = true;
             // 
             // buttonClearText
@@ -218,30 +219,18 @@
             // checkBoxSelectivelyShowHeaders
             // 
             this.checkBoxSelectivelyShowHeaders.AutoSize = true;
-            this.checkBoxSelectivelyShowHeaders.Location = new System.Drawing.Point(380, 24);
+            this.checkBoxSelectivelyShowHeaders.Location = new System.Drawing.Point(389, 55);
             this.checkBoxSelectivelyShowHeaders.Name = "checkBoxSelectivelyShowHeaders";
-            this.checkBoxSelectivelyShowHeaders.Size = new System.Drawing.Size(182, 17);
+            this.checkBoxSelectivelyShowHeaders.Size = new System.Drawing.Size(130, 17);
             this.checkBoxSelectivelyShowHeaders.TabIndex = 12;
-            this.checkBoxSelectivelyShowHeaders.Text = "Selectively show header packets";
+            this.checkBoxSelectivelyShowHeaders.Text = "Show header packets";
             this.checkBoxSelectivelyShowHeaders.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxShowGapsAbove2
-            // 
-            this.checkBoxShowGapsAbove2.AutoSize = true;
-            this.checkBoxShowGapsAbove2.Checked = true;
-            this.checkBoxShowGapsAbove2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxShowGapsAbove2.Location = new System.Drawing.Point(1019, 8);
-            this.checkBoxShowGapsAbove2.Name = "checkBoxShowGapsAbove2";
-            this.checkBoxShowGapsAbove2.Size = new System.Drawing.Size(163, 17);
-            this.checkBoxShowGapsAbove2.TabIndex = 13;
-            this.checkBoxShowGapsAbove2.Text = "Show only gaps larger than 2";
-            this.checkBoxShowGapsAbove2.UseVisualStyleBackColor = true;
             // 
             // richTextBoxHeaderInfo
             // 
-            this.richTextBoxHeaderInfo.Location = new System.Drawing.Point(6, 48);
+            this.richTextBoxHeaderInfo.Location = new System.Drawing.Point(2, 78);
             this.richTextBoxHeaderInfo.Name = "richTextBoxHeaderInfo";
-            this.richTextBoxHeaderInfo.Size = new System.Drawing.Size(508, 30);
+            this.richTextBoxHeaderInfo.Size = new System.Drawing.Size(645, 30);
             this.richTextBoxHeaderInfo.TabIndex = 14;
             this.richTextBoxHeaderInfo.Text = "";
             // 
@@ -249,20 +238,44 @@
             // 
             this.richTextBoxLostPackets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBoxLostPackets.Location = new System.Drawing.Point(520, 48);
+            this.richTextBoxLostPackets.Location = new System.Drawing.Point(653, 78);
             this.richTextBoxLostPackets.Name = "richTextBoxLostPackets";
-            this.richTextBoxLostPackets.Size = new System.Drawing.Size(677, 30);
+            this.richTextBoxLostPackets.Size = new System.Drawing.Size(548, 30);
             this.richTextBoxLostPackets.TabIndex = 15;
             this.richTextBoxLostPackets.Text = "";
+            // 
+            // checkBoxShowCorrected
+            // 
+            this.checkBoxShowCorrected.AutoSize = true;
+            this.checkBoxShowCorrected.Checked = true;
+            this.checkBoxShowCorrected.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxShowCorrected.Location = new System.Drawing.Point(389, 32);
+            this.checkBoxShowCorrected.Name = "checkBoxShowCorrected";
+            this.checkBoxShowCorrected.Size = new System.Drawing.Size(142, 17);
+            this.checkBoxShowCorrected.TabIndex = 16;
+            this.checkBoxShowCorrected.Text = "Show corrected packets";
+            this.checkBoxShowCorrected.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxShowAllPackets
+            // 
+            this.checkBoxShowAllPackets.AutoSize = true;
+            this.checkBoxShowAllPackets.Location = new System.Drawing.Point(173, 43);
+            this.checkBoxShowAllPackets.Name = "checkBoxShowAllPackets";
+            this.checkBoxShowAllPackets.Size = new System.Drawing.Size(107, 17);
+            this.checkBoxShowAllPackets.TabIndex = 17;
+            this.checkBoxShowAllPackets.Text = "Show all packets";
+            this.checkBoxShowAllPackets.UseVisualStyleBackColor = true;
+            this.checkBoxShowAllPackets.CheckedChanged += new System.EventHandler(this.checkBoxShowAllPackets_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1202, 617);
+            this.Controls.Add(this.checkBoxShowAllPackets);
+            this.Controls.Add(this.checkBoxShowCorrected);
             this.Controls.Add(this.richTextBoxLostPackets);
             this.Controls.Add(this.richTextBoxHeaderInfo);
-            this.Controls.Add(this.checkBoxShowGapsAbove2);
             this.Controls.Add(this.checkBoxSelectivelyShowHeaders);
             this.Controls.Add(this.buttonClearText);
             this.Controls.Add(this.checkBoxShowErroneousPackets);
@@ -304,9 +317,10 @@
         private System.Windows.Forms.CheckBox checkBoxShowErroneousPackets;
         private System.Windows.Forms.Button buttonClearText;
         private System.Windows.Forms.CheckBox checkBoxSelectivelyShowHeaders;
-        private System.Windows.Forms.CheckBox checkBoxShowGapsAbove2;
         private System.Windows.Forms.RichTextBox richTextBoxHeaderInfo;
         private System.Windows.Forms.RichTextBox richTextBoxLostPackets;
+        private System.Windows.Forms.CheckBox checkBoxShowCorrected;
+        private System.Windows.Forms.CheckBox checkBoxShowAllPackets;
     }
 }
 

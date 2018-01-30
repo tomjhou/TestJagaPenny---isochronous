@@ -40,3 +40,13 @@ E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenn
 E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.Properties.Resources.resources
 E:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.csproj.GenerateResource.Cache
 D:\MyDocs\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.csprojResolveAssemblyReference.cache
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Debug\TestJagaPenny.exe.config
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.exe
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.pdb
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Debug\TestJagaPenny.exe
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Debug\TestJagaPenny.pdb
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\bin\Debug\LibUsbDotNet.pdb
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.csprojResolveAssemblyReference.cache
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.Form1.resources
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.Properties.Resources.resources
+C:\Users\TomJhou\Dropbox\bin\src\github source\TestJagaPenny - isochronous\TestJagaPenny\obj\Debug\TestJagaPenny.csproj.GenerateResource.Cache

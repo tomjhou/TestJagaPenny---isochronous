@@ -34,9 +34,13 @@ namespace TestJagaPenny
         private static DateTime mStartTime = DateTime.MinValue;
 
         /// <summary>
-        /// Use this to calculate transfer rate
+        /// This is # of packets received. Dropped packets are not included.
         /// </summary>
         private static double mTotalPacketsHandled = 0.0;
+        /// <summary>
+        /// This will include (estimated) dropped packets
+        /// </summary>
+        private static double apparentPacketsTransmitted = 0;
         private static int transfersCompleted = 0;
 
         static StringBuilder sb = new StringBuilder();
@@ -47,9 +51,10 @@ namespace TestJagaPenny
 
         public class TransferParams
         {
+            public bool showAll;
             public bool showErroneous;
             public bool showHeaders;
-            public bool showLargeGapsOnly;
+            public bool showCorrected;
         }
 
         public static void StartIsochronous(RichTextBox _rtb, RichTextBox _rtb_header, RichTextBox _rtb_error_rate, TextBox _tbStatus, TransferParams tParams)
@@ -95,6 +100,7 @@ namespace TestJagaPenny
                 transfersReceived = 0;
                 packetErrors = 0;
                 mTotalPacketsHandled = 0;
+                apparentPacketsTransmitted = 0;
                 prevPacketCounter = -1;
                 old_remnant = null;
 
@@ -323,6 +329,10 @@ namespace TestJagaPenny
             int[][] jagaPacketData;
             int[] potentialErrors;
 
+            int cachedOldRemnantLength = 0;
+            if (old_remnant != null)
+                cachedOldRemnantLength = old_remnant.Length;
+
             AlignTransfersIntoJagaPackets(handle.Data, old_remnant, out jagaPacketData, out new_remnant, handle.Transferred, maxTransferSize != 160, out potentialErrors);
 
             old_remnant = new_remnant;
@@ -344,7 +354,15 @@ namespace TestJagaPenny
 
             sbCurrentTransfer.Append(string.Format("\t:{0} bytes in transfer", handle.Transferred));
 
-            if (header >= 0 && handle.Data.Length > header + 11)
+            if (cachedOldRemnantLength > 0)
+                sbCurrentTransfer.Append(", appended to " + cachedOldRemnantLength.ToString() + " from previous transfer");
+
+            if (new_remnant != null && new_remnant.Length > 0)
+            {
+                sbCurrentTransfer.Append(", with " + new_remnant.Length.ToString() + " left over for next transfer");
+            }
+
+            if (header >= 0 && handle.Data.Length >= header + 13)
             {
                 samplesPerPacket = handle.Data[header + 10];
                 channels = handle.Data[header + 9];
@@ -396,9 +414,9 @@ namespace TestJagaPenny
                     if (increment <= 0)
                     {
                         // Check if bit reversal restores correct count
-                        if (potentialErrors[packetNum] >= 0)
+                        if (potentialErrors[0] >= 0)
                         {
-                            int bitToFlip = 15 - (potentialErrors[packetNum] / 2);
+                            int bitToFlip = 15 - (potentialErrors[0] / 2);
                             bitToFlip = 1 << bitToFlip;
                             if ((packetCounter & bitToFlip) == 0)
                             {
@@ -413,12 +431,19 @@ namespace TestJagaPenny
                                     packetsCorrected++;
 
                                     increment = 1;
-                                    hasErroneousPacket = true;
                                     hasCorrectedPacket = true;
                                 }
                             }
+
+                            if (!hasCorrectedPacket)
+                            {
+                                sbCurrentTransfer.Append(" \tUnable to correct packet counter - error location " + potentialErrors[0].ToString() + ", bitToFlip is " + bitToFlip.ToString());
+                            }
                         }
                     }
+
+                    if (increment > 0)
+                        apparentPacketsTransmitted += increment;
 
                     if (increment != 1)
                     {
@@ -435,31 +460,33 @@ namespace TestJagaPenny
 
             sbCurrentTransfer.Append(", ");
 
-            samplesPerSecond = mTotalPacketsHandled * samplesPerPacket / channels / 2 / (DateTime.Now - mStartTime).TotalSeconds;
+            samplesPerSecond = apparentPacketsTransmitted * samplesPerPacket / channels / 2 / (DateTime.Now - mStartTime).TotalSeconds;
 
-            sbCurrentTransfer.Append(String.Format("{0} USB transfers complete. {1} avg samples/sec ({2} bytes transferred)\r\n\r\n",
-                            transferIndex,
-                            Math.Round(samplesPerSecond, 2),
-                            handle.Transferred));
+            sbCurrentTransfer.Append(String.Format("{0} avg samples/sec\r\n\r\n", Math.Round(samplesPerSecond, 2)));
+            if (header >= 0)
+                sb_header.Append(String.Format(", Calculated sample rate = {0} samples/sec", Math.Round(samplesPerSecond, 2)));
 
-            if (hasErroneousPacket)
+
+            if (hasErroneousPacket || hasCorrectedPacket)
                 sb_error_rate.Append(string.Format("Counter errors {0}, error rate {3:F2}%, corrected packet counters {1}, total packets {2}",
                     packetErrors, packetsCorrected, mTotalPacketsHandled, packetErrors * 100.0 / mTotalPacketsHandled));
 
-            bool showThis;
+            bool showThisPacket;
 
-            if (!tParams.showErroneous && !tParams.showHeaders)
-                showThis = true;
+            if (tParams.showAll)
+                showThisPacket = true;
             else
-                showThis = (tParams.showErroneous && hasErroneousPacket) || (tParams.showHeaders && header >= 0);
+                showThisPacket = (tParams.showErroneous && hasErroneousPacket) || (tParams.showHeaders && header >= 0) || (tParams.showCorrected && hasCorrectedPacket);
 
-            if (showThis)
+            if (showThisPacket)
             {
-                if (tParams.showErroneous && hasErroneousPacket && !hasCorrectedPacket)
+                if (!tParams.showAll && (tParams.showCorrected || tParams.showErroneous))
                 {
-                    // Show previous two transfers, because it will help us understand error.
+                    // For errors, show previous transfers, to help understand error.
                     sb.Append("\r\n\r\n");
-                    sb.Append(sbPreviousTransfer2);
+                    if (handle.Transferred < 50)
+                        // If transfers are small, then show previous two, since each transfer doesn't have that much info.
+                        sb.Append(sbPreviousTransfer2);
                     sb.Append(sbPreviousTransfer);
                 }
 
@@ -498,7 +525,7 @@ namespace TestJagaPenny
         /// <param name="jagaPacketData">Output data, reorganized into single samples</param>
         /// <param name="new_remnant">Any unprocessed portion at the end of the current transfer</param>
         /// <param name="usbTransferSize">It is assumed that "data" consists of several consecutive transfers, e.g. 16 transfers of 102 bytes each. This is the size (102) of each individual transfer.</param>
-        static void AlignTransfersIntoJagaPackets(byte[] data, byte[] old_remnant, out int[][] jagaPacketData, out byte[] new_remnant, int transferred, bool IsNewVersion, out int[] packetPotentialErrors)
+        static void AlignTransfersIntoJagaPackets(byte[] data, byte[] old_remnant, out int[][] jagaPacketData, out byte[] new_remnant, int transferred, bool IsSpikeVersion, out int[] packetPotentialErrors)
         {
             int dataWordsPerJagaPacket = 16;
             packetPotentialErrors = new int[8];
@@ -507,60 +534,81 @@ namespace TestJagaPenny
                 packetPotentialErrors[i] = -1;
 
 
-            int headerSize;
+            int frameHeaderSize;
+            int headerSize = 13;  // Header packet size
+            // If we inserted a 0 between frames, this is the location.
+            int wildcardLocation = -1;
 
-            if (IsNewVersion)
+            if (IsSpikeVersion)
             {
                 // New version has header
-                headerSize = 4;
+                frameHeaderSize = 4;
                 if (old_remnant != null && old_remnant.Length > 0)
                 {
                     // If there is leftover data from old transfer, use heuristics to determine whether
                     // it is contiguous with new transfer. Most of the time it will be, but sometimes there
                     // is a byte or two missing in between. Sometimes there is an entire packet missing.
-                    byte[] concatenatedData = new byte[old_remnant.Length + data.Length];
+                    byte[] concatenatedData = new byte[old_remnant.Length + transferred];
 
                     // Copy tail end of old data into new array
                     Array.Copy(old_remnant, concatenatedData, old_remnant.Length);
                     // Append new data onto end of old remnant
-                    Array.Copy(data, 0, concatenatedData, old_remnant.Length, data.Length);
+                    Array.Copy(data, 0, concatenatedData, old_remnant.Length, transferred);
 
-                    // Look for consecutive frame boundaries
-                    int frame1 = FindFrameBoundary(concatenatedData.Length, concatenatedData, 0);
-                    int frame2 = -1;
-                    
-                    if (frame1 >= 0)
-                        frame2 = FindFrameBoundary(concatenatedData.Length, concatenatedData, frame1 + 1);
+                    // Look for frame boundaries in two consecutive transfers
+                    int frame1 = FindFrameBoundary(old_remnant.Length, concatenatedData, 0);
+                    int frame2 = FindFrameBoundary(concatenatedData.Length, concatenatedData, old_remnant.Length);
 
                     bool useRemnant = true;
+
 
                     if (frame1 >= 0 && frame2 >= 0)
                     {
                         int interval = frame2 - frame1;
 
-                        int expectedInterval = headerSize + dataWordsPerJagaPacket * 2;
-                        int expectedInterval2 = expectedInterval + 12;  // Expected interval size if there is intervening header packet
+                        int expectedInterval = frameHeaderSize + dataWordsPerJagaPacket * 2;
 
-                        if (interval != expectedInterval && interval != expectedInterval2)
+                        int remainder = (interval % expectedInterval);
+
+                        if (remainder != 0 && remainder != headerSize)
                         {
-                            if (interval + 1 == expectedInterval || interval + 1 == expectedInterval2)
+                            if (remainder + 1 == expectedInterval || remainder + 1 == headerSize)
                             {
                                 // Very often, a single byte is dropped between packets. Just insert a zero and hope for the best.
                                 InsertZero(ref concatenatedData, old_remnant.Length);
+                                wildcardLocation = old_remnant.Length;
 
                                 // Because of zero, packet counter may be too low by a power of two. Flag location of possible error.
                                 packetPotentialErrors[0] = old_remnant.Length - 4 - frame1;
+
+                                // Account for this additional dummy byte.
+                                transferred++;
                             }
                             else
                                 // Interval between consecutive frames is wrong. Just discard old remnant, as there is most likely a missed byte or two, or possibly an entire missed packet.    
                                 useRemnant = false;
                         }
+                        else
+                        {
+                            // Interval between consecutive frames is correct. But first byte of new frame could still be wrong.
+                            packetPotentialErrors[0] = old_remnant.Length - 4 - frame1;
+                        }
                     }
 
                     if (useRemnant)
                     {
-                        // Use combination of old remnant and new data.
+                        int h = FindHeaderBoundary(concatenatedData.Length, concatenatedData);
 
+                        if (h >= 0)
+                        {
+                            // Delete 13 bytes starting at header
+                            for (int j = h + headerSize; j < concatenatedData.Length; j++)
+                                concatenatedData[j - headerSize] = concatenatedData[j];
+
+                            transferred -= headerSize;
+                        }
+
+                        // Use combination of old remnant and new data.
                         data = concatenatedData;
                         // Include the old remnant in size of new transfer
                         transferred = old_remnant.Length + transferred;
@@ -569,14 +617,14 @@ namespace TestJagaPenny
             }
             else
                 // Old version has no header, and no possibility of packets bridging across frames.
-                headerSize = 0;
+                frameHeaderSize = 0;
 
-            int bytesPerJagaPacketWithHeader = dataWordsPerJagaPacket * 2 + headerSize;
+            int bytesPerJagaPacketWithHeader = dataWordsPerJagaPacket * 2 + frameHeaderSize;
 
             int frameStart;
 
-            if (IsNewVersion)
-                frameStart = FindFrameBoundary(transferred, data, 0);
+            if (IsSpikeVersion)
+                frameStart = FindFrameBoundary(transferred, data, 0, wildcardLocation);
             else
                 // Old version. Has max transfer size = 160, but only first 32 bytes are meaningful.
                 frameStart = 0;
@@ -597,26 +645,35 @@ namespace TestJagaPenny
 
                 if (bytesRemaining < bytesPerJagaPacketWithHeader)
                 {
-                    // Possible partial packet. Make sure we didn't just miss a zero.
-
-                    // We have a partial JAGA packet. Must combine with next transfer's data.
+                    // Not enough bytes for a full packet. Must combine with next transfer's data.
                     break;
                 }
 
-                if (IsNewVersion && !MatchFrameBoundary(data, frameStart))
+                if (IsSpikeVersion)
                 {
-                    // First frame is guaranteed to match. Generally, there will be another frame immediately after this first one, but if not, then we just
-                    // quit. Sometimes there is another frame here, but offset. This is NOT LIKELY, so we don't check for it.
-                    bytesRemaining = 0;
-                    break;
+                    if (!MatchFrameBoundary(data, frameStart, wildcardLocation))
+                    {
+                        // Hmmmm, this is highly unusual. We have enough bytes for a packet, but the header isn't here.
+                        // Probably something is seriously malformed. We can just append bytes to the next transfer and hope for
+                        // the best.
+                        break;
+                    }
                 }
 
                 sampleDataTmp[currentPacket] = new int[dataWordsPerJagaPacket];
 
-                ByteToWordCopy(data, sampleDataTmp[currentPacket], frameStart + headerSize, 0, dataWordsPerJagaPacket);
+                ByteToWordCopy(data, sampleDataTmp[currentPacket], frameStart + frameHeaderSize, 0, dataWordsPerJagaPacket);
 
                 frameStart += bytesPerJagaPacketWithHeader;
                 currentPacket++;
+
+                if (IsSpikeVersion)
+                {
+                    if (MatchHeader2(data, frameStart))
+                        // Skip header frame
+                        frameStart += headerSize;
+                }
+
             }
 
             if (bytesRemaining > 0)
@@ -625,6 +682,10 @@ namespace TestJagaPenny
                 // Store partial frame as remnant, so it can be combined with data from next transfer.
                 new_remnant = new byte[bytesRemaining];
                 Array.Copy(data, frameStart, new_remnant, 0, bytesRemaining);
+
+                if (bytesRemaining < 4)
+                {
+                }
             }
 
             if (bytesRemaining < 0)
@@ -652,16 +713,16 @@ namespace TestJagaPenny
         /// Find frame boundary ('jaga' header) and actual length of each transfer
         /// </summary>
         /// <param name="startIndex"></param>
-        /// <param name="length"></param>
+        /// <param name="endIndexPlusOne"></param>
         /// <param name="data"></param>
         /// <param name="actualLengthInBytes"></param>
         /// <param name="frameBoundaryInBytes"></param>
-        static int FindFrameBoundary(int length, byte[] data, int startIndex)
+        static int FindFrameBoundary(int endIndexPlusOne, byte[] data, int startIndex, int wildcardLocation = -1)
         {
             int frameBoundaryInBytes = -1;
-            for (int j = startIndex; j < length; j++)
+            for (int j = startIndex; j < endIndexPlusOne; j++)
             {
-                if (MatchFrameBoundary(data, j))
+                if (MatchFrameBoundary(data, j, wildcardLocation))
                 {
                     // Identify where 'jaga' header is located.
                     frameBoundaryInBytes = j;
@@ -672,6 +733,12 @@ namespace TestJagaPenny
             return frameBoundaryInBytes;
         }
 
+        /// <summary>
+        /// Search for "JAGAJAGA"
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         static int FindHeaderBoundary(int length, byte[] data)
         {
             int boundaryInBytes = -1;
@@ -705,21 +772,36 @@ namespace TestJagaPenny
         }
 
 
-        static bool MatchFrameBoundary(byte[] data, int index)
+        static bool MatchFrameBoundary(byte[] data, int index, int wildcardLocation = -1)
         {
             if (data.Length < index + 4)
                 return false;
 
             if (data[index] != 'j')
-                return false;
+            {
+                if (wildcardLocation != index)
+                    return false;
+            }
 
             if (data[++index] != 'a')
-                return false;
+            {
+                if (index != wildcardLocation)
+                    return false;
+            }
 
             if (data[++index] != 'g')
-                return false;
+            {
+                if (index != wildcardLocation)
+                    return false;
+            }
 
-            return (data[++index] == 'a');
+            if (data[++index] != 'a')
+            {
+                if (index != wildcardLocation)
+                    return false;
+            }
+
+            return true;
         }
 
         static bool MatchHeader2(byte[] data, int index)

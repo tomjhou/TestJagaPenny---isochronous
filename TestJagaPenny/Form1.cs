@@ -210,9 +210,11 @@ namespace TestJagaPenny
         private void buttonReadIso_Click(object sender, EventArgs e)
         {
             ReadIsochronous.TransferParams tParams = new ReadIsochronous.TransferParams();
+
+            tParams.showAll = checkBoxShowAllPackets.Checked;
             tParams.showErroneous = checkBoxShowErroneousPackets.Checked;
             tParams.showHeaders = checkBoxSelectivelyShowHeaders.Checked;
-            tParams.showLargeGapsOnly = checkBoxShowGapsAbove2.Checked;
+            tParams.showCorrected = checkBoxShowCorrected.Checked;
 
             ReadIsochronous.StartIsochronous(richTextBox1, richTextBoxHeaderInfo, richTextBoxLostPackets, textBoxCount, tParams);
         }
@@ -233,6 +235,15 @@ namespace TestJagaPenny
         private void buttonClearText_Click(object sender, EventArgs e)
         {
             richTextBox1.Clear();
+        }
+
+        private void checkBoxShowAllPackets_CheckedChanged(object sender, EventArgs e)
+        {
+            bool c = checkBoxShowAllPackets.Checked;
+
+            checkBoxShowErroneousPackets.Enabled = !c;
+            checkBoxShowCorrected.Enabled = !c;
+            checkBoxSelectivelyShowHeaders.Enabled = !c;
         }
     }
 }
